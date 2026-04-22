@@ -842,7 +842,7 @@ with st.container():
             "n_estimators", min_value=10, max_value=2000, value=100, step=10
         )
         max_depth = st.number_input(
-            "max_depth (0 -> None)", min_value=0, max_value=100, value=0, step=1
+            "max_depth", min_value=0, max_value=100, value=0, step=1
         )
         min_samples_leaf = st.number_input(
             "min_samples_leaf", min_value=1, max_value=50, value=1, step=1
