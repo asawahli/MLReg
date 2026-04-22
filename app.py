@@ -679,7 +679,7 @@ with st.container():
     )
     # random_state = st.number_input("Random state (integer)", value=42, step=1)
     random_state = 42
-    apply_split = st.button("Apply split / preview train/test")
+    apply_split = st.button("Apply Changes")
 
     if apply_split:
         # Keep only numeric features automatically (imputer will handle missing)
