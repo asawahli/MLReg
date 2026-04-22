@@ -675,7 +675,7 @@ with st.container():
     )
 
     test_size = st.slider(
-        "Test set size (fraction)", min_value=0.05, max_value=0.5, value=0.2, step=0.05
+        "Test set size (fraction)", min_value=0.05, max_value=0.5, value=0.2, step=0.01
     )
     # random_state = st.number_input("Random state (integer)", value=42, step=1)
     random_state = 42
@@ -702,7 +702,7 @@ with st.container():
         st.success(
             f"Split applied: train={X_train.shape[0]} rows, test={X_test.shape[0]} rows."
         )
-        st.dataframe(pd.concat([X_train.head(), y_train.head()], axis=1))
+        #st.dataframe(pd.concat([X_train.head(), y_train.head()], axis=1))
 
 # If no split in session_state, create a default one (not applied until user clicks)
 if not st.session_state.split:
