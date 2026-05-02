@@ -19,7 +19,10 @@ import seaborn as sns
 import time
 import pickle
 from scipy import stats
+import requests
 from openai import OpenAI
+from google import genai
+
 
 from prompts import ai_prompts
 # from radar import radar_factory
@@ -44,6 +47,48 @@ def init_session_state():
         st.session_state.model_train_state = None
     if "ai_summary" not in st.session_state:
         st.session_state.ai_summary = None
+    if "ai_init" not in st.session_state:
+        st.session_state.ai_init = {
+            "logfare_models": get_logfare_models(),
+            "google_models": [],
+        }
+    # if "api_google" not in st.session_state:
+    #     st.session_state.api_google = None
+    if "saved_api_google" not in st.session_state:
+        st.session_state.saved_api_google = ""
+    # if "api_logfare" not in st.session_state:
+    #     st.session_state.api_logfare = None
+    if "saved_api_logfare" not in st.session_state:
+        st.session_state.saved_api_logfare = ""
+
+
+def get_logfare_models():
+    url = "https://logfare.ai/v1/models"
+    url_response = requests.get(url)
+    try:
+        models = url_response.json()
+        models_id = [model["id"] for model in models["data"]]
+    except Exception:
+        print(f"Error: {url_response.status_code} - {url_response.text}")
+        models_id = []
+    return models_id
+
+
+def get_google_models():
+    try:
+        api = st.session_state.saved_api_google
+        if not api:
+            return
+        gclient = genai.Client(api_key=api)
+        gmodels = [
+            gclient.models.list()[i].name.split("/")[-1]
+            for i in range(len(gclient.models.list()))
+            if "generateContent" in gclient.models.list()[i].supported_actions
+        ]
+        st.session_state.ai_init["google_models"] = gmodels
+    except Exception:
+        st.session_state.ai_init["google_models"] = []
+    # return gmodels
 
 
 def reset_model_train_state():
@@ -226,17 +271,18 @@ def plot_summary(train, test, metric="r2"):
 
 
 ## AI response:
-def ai_support(provider, ai_model, inputs, type, figs=None, api=None):
+def ai_support(provider, ai_model, inputs, type, figs=None):
     """
     provider: [logfare.ai, gemini]
     ai_model: ai_model
     inputs:  inputs
     type: string ['describe', 'corr', 'residuals', 'summary']
-    api: api
     """
     if provider == "logfare.ai":
-        client = OpenAI(base_url="https://logfare.ai/v1", api_key="not-needed")
+        api = st.session_state["saved_api_logfare"]
+        client = OpenAI(base_url="https://logfare.ai/v1", api_key=api)
     elif provider == "gemini":
+        api = st.session_state["saved_api_google"]
         client = OpenAI(
             api_key=api,
             base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
@@ -337,32 +383,43 @@ st.html(
     # unsafe_allow_html=True,
 )
 
+st.write(st.session_state.saved_api_logfare)
+st.write(st.session_state.saved_api_google)
 with st.sidebar:
     st.write("AI Client")
-    # ai_client = st.selectbox(
-    #     "Select Model", ["gemini-3-flash", "kimi-k2.5", "minimax-m2.7"]
-    # )
 
     provider = st.selectbox("AI provider", ["logfare.ai", "gemini"])
     if provider == "logfare.ai":
-        ai_model = st.selectbox(
-            "Model", ["gemini-3-flash", "kimi-k2.5", "minimax-m2.7"]
+        current_logfare_api = st.text_input(
+            "API",
+            key="api_logfare_widget",
+            value=st.session_state.saved_api_logfare,
+            type="password",
         )
-        api = None
-        st.warning(
-            "This application uses Logfare AI services to process requests. Inputs, outputs, and related data may be logged and stored by Logfare for research and operational purposes in accordance with their policies. Users should avoid submitting sensitive or confidential information."
-        )
-    elif provider == "gemini":
+        if current_logfare_api != st.session_state.saved_api_logfare:
+            st.session_state.saved_api_logfare = current_logfare_api
         ai_model = st.selectbox(
             "Model",
-            [
-                "gemini-3.1-pro-preview",
-                "gemini-3-flash-preview",
-                "gemini-2.5-pro",
-                "gemini-2.5-flash",
-            ],
+            st.session_state.ai_init["logfare_models"],
         )
-        api = st.text_input("API")
+        st.warning(
+            "* This application uses Logfare AI services to process requests. Inputs, outputs, and related data may be logged and stored by Logfare for research and operational purposes in accordance with their policies. Users should avoid submitting sensitive or confidential information.\n * Only results of analysis used in AI prompt. The original dataset not used in prompts"
+        )
+    elif provider == "gemini":
+        current_google_api = st.text_input(
+            "API",
+            value=st.session_state.saved_api_google,
+            key="api_google_widget",
+            type="password",
+        )
+        if current_google_api != st.session_state.saved_api_google:
+            st.session_state.saved_api_google = current_google_api
+            get_google_models()
+        ai_model = st.selectbox(
+            "Model",
+            st.session_state.ai_init["google_models"],
+        )
+
 st.markdown("---")
 
 # --- File upload ---
@@ -379,13 +436,6 @@ with st.expander("Upload CSV file", expanded=True):
             st.success(
                 f"Loaded data with {df.shape[0]} rows and {df.shape[1]} columns."
             )
-            # with st.expander("Show raw CSV (first 5000 chars)"):
-            #     try:
-            #         uploaded.seek(0)
-            #         raw = uploaded.read().decode("utf-8")
-            #         st.code(raw[:5000])
-            #     except Exception:
-            #         pass
 
 if st.session_state.df is None:
     st.info("Please upload a CSV file to continue.")
@@ -428,7 +478,6 @@ with st.container():
                                     ai_model=ai_model,
                                     inputs=describe_stat.to_string(),
                                     type="describe",
-                                    api=api,
                                 )
                             )
                     except Exception as e:
@@ -573,6 +622,10 @@ with st.container():
         col.pyplot(fig)
     with tab6:
         corr_method = st.selectbox("Method ", ["pearson", "kendall", "spearman"])
+        corr_var = st.multiselect(
+            "Variables to be included", options=df.columns, default=df.columns
+        )
+        corr = df[corr_var].corr(method=corr_method)
         cmap_dic = {
             "vlag": "vlag",
             "coolwarm": "coolwarm",
@@ -586,11 +639,11 @@ with st.container():
         max_cor = columns[1].number_input("Max Value", -1.0, 1.0, 1.0)
         center_cor = columns[2].number_input("Center Value", -1.0, 1.0, 0.0)
         cmap_select = st.selectbox("Color map", cmap_dic.keys(), 0)
-        st.dataframe(df.corr(method=corr_method))
+        st.dataframe(corr)
         _, col, _ = st.columns([1, 3, 1])
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(corr.shape[0], corr.shape[0] / 2))
         sns.heatmap(
-            df.corr(method=corr_method),
+            corr,
             ax=ax,
             annot=True,
             # cmap="vlag",
@@ -603,18 +656,18 @@ with st.container():
 
         with st.expander("AI Explanation", False, key="expand_cor"):
             if st.button("Generate Text", key="button_cor"):
-                with st.spinner("In progress...", show_time=True):
-                    st.markdown(
-                        ai_support(
-                            provider=provider,
-                            ai_model=ai_model,
-                            inputs=df.corr(method=corr_method),
-                            type="corr",
-                            api=api,
+                try:
+                    with st.spinner("In progress...", show_time=True):
+                        st.markdown(
+                            ai_support(
+                                provider=provider,
+                                ai_model=ai_model,
+                                inputs=df.corr(method=corr_method),
+                                type="corr",
+                            )
                         )
-                    )
-
-            pass
+                except Exception as e:
+                    st.error(f"Error: {e}")
 
 
 st.markdown("---")
@@ -679,7 +732,7 @@ with st.container():
     )
     # random_state = st.number_input("Random state (integer)", value=42, step=1)
     random_state = 42
-    apply_split = st.button("Apply Changes")
+    apply_split = st.button("Apply split / preview train/test")
 
     if apply_split:
         # Keep only numeric features automatically (imputer will handle missing)
@@ -702,7 +755,7 @@ with st.container():
         st.success(
             f"Split applied: train={X_train.shape[0]} rows, test={X_test.shape[0]} rows."
         )
-        #st.dataframe(pd.concat([X_train.head(), y_train.head()], axis=1))
+        st.dataframe(pd.concat([X_train.head(), y_train.head()], axis=1))
 
 # If no split in session_state, create a default one (not applied until user clicks)
 if not st.session_state.split:
@@ -1111,6 +1164,21 @@ with st.container():
         cols[1].markdown("**Metrics on test set**")
         cols[1].json(cv["metrics_test"])
 
+        # save model as pickle
+        try:
+            pipeline = st.session_state.last_train["pipeline"]
+            b = pickle.dumps(pipeline)
+            st.download_button(
+                "Download Model",
+                data=b,
+                file_name=f"{st.session_state.last_train['name']}.model",
+                mime="application/octet-stream",
+                help="Download Model",
+            )
+
+        except Exception as e:
+            st.error(f"Error: {e}")
+
         diag_tab1, diag_tab2, diag_tab3 = st.tabs(
             ["Predictions", "Residuals", "Feature Importance"]
         )
@@ -1161,65 +1229,12 @@ with st.container():
                             cv["fig_rf_test"],
                             cv["fig_qq_test"],
                         ],
-                        api=api,
                     )
                     st.session_state.current_view["ai_explain"] = resp
             if cv.get("ai_explain") is not None:
                 st.markdown(st.session_state.current_view["ai_explain"])
 
     col2.button("Store model (save into session dictionary)", on_click=store_model)
-    # with col2:
-    #     if st.button("Store model (save into session dictionary)"):
-    #         if st.session_state.get("last_train") is None:
-    #             st.warning(
-    #                 "No model trained in this session to store. Train first, then store."
-    #             )
-    #         else:
-    #             key = model_name_input
-    #             # store a copy of the pipeline and metrics
-    #             entry = {
-    #                 "type": st.session_state.last_train.get("type"),
-    #                 "pipeline": st.session_state.last_train.get("pipeline"),
-    #                 "metrics_test": st.session_state.last_train.get("metrics_test"),
-    #                 "metrics_train": st.session_state.last_train.get("metrics_train"),
-    #                 "params": st.session_state.last_train.get("params"),
-    #                 "timestamp": st.session_state.last_train.get("timestamp"),
-    #             }
-    #             st.session_state.models[key] = entry
-    #             st.success(f"Stored model under key: '{key}'")
-
-    # with col3:
-    #     if st.button("Delete stored model"):
-    #         key_to_delete = st.selectbox(
-    #             "Select stored model key to delete",
-    #             options=list(st.session_state.models.keys()) or ["(none)"],
-    #         )
-    #         # small confirm button
-    #         if key_to_delete != "(none)":
-    #             if st.button("Confirm delete"):
-    #                 if key_to_delete in st.session_state.models:
-    #                     del st.session_state.models[key_to_delete]
-    #                     st.success(f"Deleted model '{key_to_delete}'.")
-    #                 else:
-    #                     st.warning("Key not found (it may have been deleted already).")
-
-    # with col4:
-    #     if st.button("Download last trained model (pickle)"):
-    #         if st.session_state.get("last_train") is None:
-    #             st.warning("No model trained to download.")
-    #         else:
-    #             # create pickle bytes
-    #             try:
-    #                 pipeline = st.session_state.last_train["pipeline"]
-    #                 b = pickle.dumps(pipeline)
-    #                 st.download_button(
-    #                     "Click to download .pkl",
-    #                     data=b,
-    #                     file_name=f"{st.session_state.last_train['name']}.pkl",
-    #                     mime="application/octet-stream",
-    #                 )
-    #             except Exception as e:
-    #                 st.error(f"Could not create pickle: {e}")
 
 st.markdown("---")
 
@@ -1259,7 +1274,7 @@ with st.container():
                 st.session_state[f"summary_{xx}"]
                 .reset_index(drop=True)
                 .style.highlight_max(subset=["r2"], color="lightgreen")
-                .highlight_min(subset=["mse", "rmse"], color="lightgreen")
+                .highlight_min(subset=["mse", "rmse", "mae"], color="lightgreen")
             )
         col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
         key_to_delete = col1.selectbox(
@@ -1306,7 +1321,6 @@ with st.container():
                         ],
                         type="summary",
                         figs=None,
-                        api=api,
                     )
                     st.session_state["ai_summary"] = resp_sum
             if st.session_state["ai_summary"] is not None:
