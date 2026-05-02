@@ -383,8 +383,6 @@ st.html(
     # unsafe_allow_html=True,
 )
 
-st.write(st.session_state.saved_api_logfare)
-st.write(st.session_state.saved_api_google)
 with st.sidebar:
     st.write("AI Client")
 
