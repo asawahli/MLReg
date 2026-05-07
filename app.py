@@ -1084,7 +1084,7 @@ with st.container():
                 model_obj = RandomForestRegressor(**params)
             elif model_type == "KNN (K-Nearest Neighbors)":
                 model_obj = KNeighborsRegressor(**params)
-            elif model_type == "SVR":
+            elif model_type == "SVR (Support Vector Regression)":
                 model_obj = SVR(**params)
             elif model_type == "XGBoost":
                 model_obj = XGBRegressor(**params)
