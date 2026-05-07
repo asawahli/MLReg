@@ -767,7 +767,7 @@ with st.container():
         st.success(
             f"Split applied: train={X_train.shape[0]} rows, test={X_test.shape[0]} rows."
         )
-        st.dataframe(pd.concat([X_train.head(), y_train.head()], axis=1))
+        # st.dataframe(pd.concat([X_train.head(), y_train.head()], axis=1))
 
 # If no split in session_state, create a default one (not applied until user clicks)
 if not st.session_state.split:
