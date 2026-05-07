@@ -444,16 +444,7 @@ df = df.select_dtypes(include=[np.number])
 
 # --- Data exploration container ---
 with st.container():
-    st.markdown("**Data Health**")
-    info_df = pd.DataFrame(
-        {
-            #"dtype": df.dtypes.astype(str),
-            "Available": df.notnull().sum(),
-            "Missing": df.isnull().sum(),
-            "Completion %": (df.notnull().sum()/len(df) * 100).round(2)
-        }
-    )
-    st.dataframe(info_df)
+
     st.subheader("Data Exploration")
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
         [
@@ -467,6 +458,16 @@ with st.container():
     )
 
     with tab1:  # Data Preview
+        st.markdown("**Data Health**")
+        info_df = pd.DataFrame(
+            {
+                #"dtype": df.dtypes.astype(str),
+                "Available": df.notnull().sum(),
+                "Missing": df.isnull().sum(),
+                "Completion %": (df.notnull().sum()/len(df) * 100).round(2)
+            }
+        )
+        st.dataframe(info_df)
         st.markdown("**Preview**")
         st.dataframe(df)
         st.markdown(f"**Size:** {df.shape[0]} rows × {df.shape[1]} columns")
