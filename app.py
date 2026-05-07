@@ -955,7 +955,7 @@ with st.container():
             help="Standardize features by removing the mean and scaling to unit variance.",
         )
 
-    elif model_type == "SVR":
+    elif model_type == "SVR (Support Vector Regression)":
         st.text("Support Vector Regression.")
         kernel = st.selectbox("kernel", options=["rbf", "linear", "poly", "sigmoid"])
         C = st.number_input("C (regularization)", min_value=0.01, value=1.0, step=0.01)
