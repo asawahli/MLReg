@@ -747,7 +747,7 @@ with st.container():
     if apply_split:
         # Keep only numeric features automatically (imputer will handle missing)
         df_temp = df.copy()
-        df_temp = df_temp[feature_cols+ [traget_col]]
+        df_temp = df_temp[feature_cols+ [target_col]]
         df_temp = missing_methods[missing_choice](df_temp)
         X = df_temp[feature_cols]
         y = df_temp[target_col]
