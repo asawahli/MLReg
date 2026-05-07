@@ -565,7 +565,7 @@ with st.container():
             "Color",
             "#5587D7",
         )
-        tar_alpha = cols[1].number_input("alpha", 0.0, 1.00, 1.00)
+        tar_alpha = cols[1].slider("Opacity ", 0, 100, 100, 1, key='Opacity01') / 100
 
         # cols = st.columns(3)
         # @st.cache_data
@@ -601,7 +601,7 @@ with st.container():
         ylabel = cols[1].text_input("Y Label", y_data)
         markersize = cols[2].number_input("Marker Size", value=None)
         markershape = cols[3].selectbox("marker", markers.keys(), 0)
-        alpha = cols[0].slider("transparency ", 0, 100, 100, 1) / 100
+        alpha = cols[0].slider("Opacity ", 0, 100, 100, 1, key='Opacity02') / 100
 
         with st.container(border=False):
             cols = st.columns(4)
