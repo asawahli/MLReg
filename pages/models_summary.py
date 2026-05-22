@@ -54,26 +54,101 @@ with st.container():
             st.rerun()
             col3.success(f"Deleted model '{key_to_delete}'.")
             # update_summary()
+        tabs = st.tabs(["Train Metrics", "Test Metrics", "Overall"])
+        with tabs[0]:
+            col_1, col_2 = st.columns([1, 1])
+            color = col_1.radio(
+                "Color",
+                ["Single Color", "Multi Color"],
+                key="colorful_summ_train",
+                horizontal=True,
+            )
+            if color == "Multi Color":
+                singlecolor = False
+            else:
+                singlecolor = col_2.color_picker(
+                    "Pick a color for the bars", "#1f77b4", key="color_summ_train"
+                )
+            col1, col2 = st.columns([1, 1])
+            # col.pyplot(fig)
+            fig_r2 = plot_summary(
+                st.session_state["summary_train"], None, "r2", colorfull=singlecolor
+            )
+            fig_mse = plot_summary(
+                st.session_state["summary_train"], None, "mse", colorfull=singlecolor
+            )
+            fig_rmse = plot_summary(
+                st.session_state["summary_train"], None, "rmse", colorfull=singlecolor
+            )
+            fig_mae = plot_summary(
+                st.session_state["summary_train"], None, "mae", colorfull=singlecolor
+            )
 
-        col1, col2 = st.columns([1, 1])
-        # col.pyplot(fig)
-        fig_r2 = plot_summary(
-            st.session_state["summary_train"], st.session_state["summary_test"], "r2"
-        )
-        fig_mse = plot_summary(
-            st.session_state["summary_train"], st.session_state["summary_test"], "mse"
-        )
-        fig_rmse = plot_summary(
-            st.session_state["summary_train"], st.session_state["summary_test"], "rmse"
-        )
-        fig_mae = plot_summary(
-            st.session_state["summary_train"], st.session_state["summary_test"], "mae"
-        )
+            col1.pyplot(fig_r2)
+            col2.pyplot(fig_mse)
+            col1.pyplot(fig_rmse)
+            col2.pyplot(fig_mae)
+        with tabs[1]:
+            col_1, col_2 = st.columns([1, 1])
+            color = col_1.radio(
+                "Color",
+                ["Single Color", "Multi Color"],
+                key="colorful_summ_test",
+                horizontal=True,
+            )
+            if color == "Multi Color":
+                singlecolor = False
+            else:
+                singlecolor = col_2.color_picker(
+                    "Pick a color for the bars", "#1f77b4", key="color_summ_test"
+                )
+            col1, col2 = st.columns([1, 1])
+            # col.pyplot(fig)
+            fig_r2 = plot_summary(
+                st.session_state["summary_test"], None, "r2", colorfull=singlecolor
+            )
+            fig_mse = plot_summary(
+                st.session_state["summary_test"], None, "mse", colorfull=singlecolor
+            )
+            fig_rmse = plot_summary(
+                st.session_state["summary_test"], None, "rmse", colorfull=singlecolor
+            )
+            fig_mae = plot_summary(
+                st.session_state["summary_test"], None, "mae", colorfull=singlecolor
+            )
 
-        col1.pyplot(fig_r2)
-        col2.pyplot(fig_mse)
-        col1.pyplot(fig_rmse)
-        col2.pyplot(fig_mae)
+            col1.pyplot(fig_r2)
+            col2.pyplot(fig_mse)
+            col1.pyplot(fig_rmse)
+            col2.pyplot(fig_mae)
+        with tabs[2]:
+            col1, col2 = st.columns([1, 1])
+            # col.pyplot(fig)
+            fig_r2 = plot_summary(
+                st.session_state["summary_train"],
+                st.session_state["summary_test"],
+                "r2",
+            )
+            fig_mse = plot_summary(
+                st.session_state["summary_train"],
+                st.session_state["summary_test"],
+                "mse",
+            )
+            fig_rmse = plot_summary(
+                st.session_state["summary_train"],
+                st.session_state["summary_test"],
+                "rmse",
+            )
+            fig_mae = plot_summary(
+                st.session_state["summary_train"],
+                st.session_state["summary_test"],
+                "mae",
+            )
+
+            col1.pyplot(fig_r2)
+            col2.pyplot(fig_mse)
+            col1.pyplot(fig_rmse)
+            col2.pyplot(fig_mae)
 
         with st.expander("AI Explanation", False, key="expand_summ"):
             if st.button("Generate Text", key="button_summ"):

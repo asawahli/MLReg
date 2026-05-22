@@ -8,7 +8,7 @@ with st.sidebar:
     st.write("")
 
 pages = [
-    st.Page("pages/0_home.py", title="Home"),
+    st.Page("pages/home.py", title="Home"),
     st.Page("pages/eda.py", title="Explore Data"),
     st.Page("pages/preprocessing.py", title="Preprocessing"),
     st.Page("pages/train_model.py", title="Train Models"),
@@ -42,4 +42,4 @@ footer {visibility: hidden;}
 </div>
 """
 
-st.markdown(footer, unsafe_allow_html=True)
+# st.markdown(footer, unsafe_allow_html=True)

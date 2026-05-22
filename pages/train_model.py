@@ -412,10 +412,27 @@ with st.container():
         st.markdown(f"## {model_type} model result")
         cols = st.columns(2)
         cols[0].markdown("**Metrics on train set**")
-        cols[0].json(cv["metrics_train"])
+        # cols[0].json(cv["metrics_train"])
+        cols[0].dataframe(
+            pd.DataFrame(
+                list(cv["metrics_train"].items()), columns=["Metric", "Value"]
+            ),
+            column_config={
+                "Value": st.column_config.NumberColumn(format="%0.3f"),
+                "Metric": st.column_config.TextColumn("Metric", width="small"),
+            },
+            hide_index=True,
+        )
         cols[1].markdown("**Metrics on test set**")
-        cols[1].json(cv["metrics_test"])
-
+        # cols[1].json(cv["metrics_test"])
+        cols[1].dataframe(
+            pd.DataFrame(list(cv["metrics_test"].items()), columns=["Metric", "Value"]),
+            column_config={
+                "Value": st.column_config.NumberColumn(format="%0.3f"),
+                "Metric": st.column_config.TextColumn("Metric", width="small"),
+            },
+            hide_index=True,
+        )
         # save model as pickle
         try:
             pipeline = st.session_state.last_train["pipeline"]

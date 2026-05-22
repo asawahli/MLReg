@@ -124,19 +124,52 @@ def feature_importances_if_any(model, feature_names):
         return None, None
 
 
-def plot_summary(train, test, metric="r2"):
-    m_train = train[["model_key", metric]].copy()
-    m_train["dataset"] = "Train"
-
-    m_test = test[["model_key", metric]].copy()
-    m_test["dataset"] = "Test"
-
-    combined_m = pd.concat([m_train, m_test])
+def plot_summary(train=None, test=None, metric="r2", colorfull=False):
+    try:
+        m_train = train[["model_key", metric]].copy()
+        m_train["dataset"] = "Train"
+        combined_m = m_train
+    except:
+        pass
+    try:
+        m_test = test[["model_key", metric]].copy()
+        m_test["dataset"] = "Test"
+        combined_m = m_test
+    except:
+        pass
 
     fig, ax = plt.subplots()
-    sns.barplot(
-        data=combined_m, y="model_key", x=metric, hue="dataset", ax=ax, edgecolor="k"
-    )
+    if train is not None and test is not None:
+        combined_m = pd.concat([m_train, m_test])
+
+        sns.barplot(
+            data=combined_m,
+            y="model_key",
+            x=metric,
+            hue="dataset",
+            ax=ax,
+            edgecolor="k",
+        )
+    else:
+        if colorfull:
+            sns.barplot(
+                data=combined_m,
+                y="model_key",
+                x=metric,
+                color=colorfull,
+                ax=ax,
+                edgecolor="k",
+            )
+        else:
+            sns.barplot(
+                data=combined_m,
+                y="model_key",
+                x=metric,
+                hue="model_key",
+                ax=ax,
+                edgecolor="k",
+            )
+
     ax.set_xlabel(metric.upper())
     ax.set_ylabel("")
     if metric == "r2":
