@@ -1,9 +1,16 @@
 import streamlit as st
 from src.session_state import init_session_state
 
+hide_st_style = """
+<style>
+.stToolbarActionButton {visibility: hidden;}
+"""
+
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 init_session_state()
 
-st.set_page_config(page_title="MLreg", layout="wide")
+st.set_page_config(page_title="MLreg", layout="wide", page_icon="assets/icon.svg")
 with st.sidebar:
     st.write("")
 

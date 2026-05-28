@@ -1,33 +1,26 @@
 import streamlit as st
 from src.utils import load_csv
-
+import pathlib
 
 st.set_page_config(page_title="MLReg", layout="wide")
 
-st.html(
-    """
-    <div style="padding:18px;border-radius:8px; border:1px solid black">
-        <h1 style="color:#0099FF; margin-bottom:5px"> 
-            <span style="font-size:60px"> MLReg </span>
-        </h1>
-        <h3 style="color:#0099FF; margin-top:0px">
-            <span style="font-size:20px">Interactive Machine Learning Regression App</span>
-        </h3>
 
-        <p style="font-size:15px;">  
-            Use this app to:
-        </p>
-      <ul >
-        <li>Upload and explore your dataset</li>
-        <li>Select features and target variables.</li>
-        <li>Apply preprocessing and train models.</li>
-        <li>Save trained models for the current session.</li>
-        <li>Upload a models and make predictions.</li>
-      </ul>
-    </div>
-    """,
-    # unsafe_allow_html=True,
-)
+# logo
+with st.columns([1, 1.5, 1])[1]:
+    st.image("assets/logo.svg", width="stretch")
+
+# title
+# st.markdown(
+#     """
+#     <div style="text-align: center;">
+#         <h2 style="margin-bottom: 5px; font-family: "Montserrat">
+#         Interactive Machine Learning Regression App
+#         </h2>
+#     </div>
+#     """,
+#     unsafe_allow_html=True,
+# )
+st.html("assets/home.html", unsafe_allow_javascript=True)
 
 
 st.markdown("### Start here")

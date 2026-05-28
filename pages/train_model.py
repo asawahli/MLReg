@@ -385,6 +385,10 @@ with st.container():
                 "fig_f": fig_f,
                 "fi_df": fi_df,
                 "ai_explain": None,
+                "X_train": X_train,
+                "X_test": X_test,
+                "y_train": y_train,
+                "y_test": y_test,
             }
 
             # keep last trained model in session state temporarily
@@ -434,22 +438,22 @@ with st.container():
             hide_index=True,
         )
         # save model as pickle
-        try:
-            pipeline = st.session_state.last_train["pipeline"]
-            b = pickle.dumps(pipeline)
-            st.download_button(
-                "Download Model",
-                data=b,
-                file_name=f"{st.session_state.last_train['name']}.model",
-                mime="application/octet-stream",
-                help="Download Model",
-            )
+        # try:
+        #     pipeline = st.session_state.last_train["pipeline"]
+        #     b = pickle.dumps(pipeline)
+        #     st.download_button(
+        #         "Download Model",
+        #         data=b,
+        #         file_name=f"{st.session_state.last_train['name']}.model",
+        #         mime="application/octet-stream",
+        #         help="Download Model",
+        #     )
 
-        except Exception as e:
-            st.error(f"Error: {e}")
+        # except Exception as e:
+        #     st.error(f"Error: {e}")
 
-        diag_tab1, diag_tab2, diag_tab3 = st.tabs(
-            ["Predictions", "Residuals", "Feature Importance"]
+        diag_tab1, diag_tab2, diag_tab3, diag_tab4 = st.tabs(
+            ["Predictions", "Residuals", "Feature Importance", "SHAP (beta)"]
         )
 
         with diag_tab1:
@@ -480,6 +484,44 @@ with st.container():
             else:
                 st.info("Feature importance not available for this model type.")
 
+        with diag_tab4:
+            from src.shap import explain, plot_beeswarm
+
+            st.warning(
+                "Currently supports Linear Models only. More algorithms coming soon!"
+            )
+            if st.session_state.last_train["type"] in [
+                "Linear Regression",
+                "Ridge",
+                "Lasso",
+                "Elastic Net",
+            ]:
+                type = "linear"
+            elif st.session_state.last_train["type"] in [
+                "Random Forest",
+                "XGBoost",
+                "Gradient Boosting",
+            ]:
+                type = "tree"
+
+            elif st.session_state.last_train["type"] in [
+                "SVR (Support Vector Regression)",
+                "KNN (K-Nearest Neighbors)",
+            ]:
+                type = "kernal"
+            #
+            #  "Neural Network (MLP)"
+
+            try:
+                shap_values = explain(
+                    type, pipeline[-1], st.session_state.current_view["X_test"]
+                )
+                st.write("after")
+                fig = plot_beeswarm(shap_values)
+                st.pyplot(fig)
+            except Exception as e:
+                st.error(e)
+
         with st.expander("AI Explanation ", False, key="expand_figs"):
             if st.button("Generate Text", key="button_figs"):
                 with st.spinner("In progress...", show_time=True):
@@ -505,6 +547,21 @@ with st.container():
         "Store model (save into session dictionary)",
         on_click=lambda: store_model(model_name_input),
     )
+
+    try:
+        pipeline = st.session_state.last_train["pipeline"]
+        b = pickle.dumps(pipeline)
+        col3.download_button(
+            "Download Model",
+            data=b,
+            file_name=f"{st.session_state.last_train['name']}.model",
+            mime="application/octet-stream",
+            help="Download Model",
+            key="fownload_3",
+        )
+
+    except Exception as e:
+        st.error(f"Error: {e}")
 
 st.markdown("---")
 
