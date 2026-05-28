@@ -410,10 +410,10 @@ with st.container():
         cv = st.session_state.current_view
 
         if st.session_state.model_train_state is not None:
-            st.success("Model trained.")
+            st.success(f" {st.session_state.last_train['type']}Model trained.")
         else:
             st.warning(f"{model_type} model not trained")
-        st.markdown(f"## {model_type} model result")
+        st.markdown(f"## {st.session_state.last_train['type']} model result")
         cols = st.columns(2)
         cols[0].markdown("**Metrics on train set**")
         # cols[0].json(cv["metrics_train"])
@@ -474,7 +474,7 @@ with st.container():
             cols[1].pyplot(cv["fig_rf_test"])
             cols[2].pyplot(cv["fig_qq_test"])
 
-        cols = st.columns(3, vertical_alignment="bottom")
+        # cols = st.columns(3, vertical_alignment="bottom")
         with diag_tab3:
             if cv["fig_f"] is not None:
                 st.dataframe(cv["fi_df"])
@@ -514,11 +514,13 @@ with st.container():
 
             try:
                 shap_values = explain(
-                    type, pipeline[-1], st.session_state.current_view["X_test"]
+                    type,
+                    st.session_state.last_train["pipeline"][-1],
+                    st.session_state.current_view["X_test"],
                 )
-                st.write("after")
-                fig = plot_beeswarm(shap_values)
-                st.pyplot(fig)
+                with st.columns([1, 3, 1])[1]:
+                    fig = plot_beeswarm(shap_values)
+                    st.pyplot(fig)
             except Exception as e:
                 st.error(e)
 
