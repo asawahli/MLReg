@@ -1,12 +1,12 @@
 import streamlit as st
 from src.session_state import init_session_state
 
-hide_st_style = """
-<style>
-.stToolbarActionButton {visibility: hidden;}
-"""
+# hide_st_style = """
+# <style>
+# .stToolbarActionButton {visibility: hidden;}
+# """
 
-st.markdown(hide_st_style, unsafe_allow_html=True)
+# st.markdown(hide_st_style, unsafe_allow_html=True)
 
 init_session_state()
 
