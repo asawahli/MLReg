@@ -126,4 +126,4 @@ Select a pre-loaded sample dataset below to test the application features instan
 # Optional: Add a friendly button to jump back home
 st.write("---")
 if st.button("Ready? Go back to Home"):
-    st.switch_page("pages/0_home.py")
+    st.switch_page("pages/home.py")
