@@ -1,130 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaScript Hover Box</title>
-    <style>
-        /* Container layout */
-        .box-container {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
-        }
+<style>
+    /* Container layout */
+    .box-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 20px;
+    }
 
-        /* Base styling for the boxes */
-        .hover-box {
-            background-color: #d3d3d3; 
-            color: #333333;            
-            width: 300px;  
-            height: 10rem;
+    /* Base styling for the boxes */
+    .hover-box {
+        background-color: #d3d3d3; 
+        color: #333333;            
+        width: 300px;  
+        height: 10rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        box-sizing: border-box;
+        word-break: break-word;
+        text-align: center;  
+        hyphens: auto;      
+        font-family: Arial, sans-serif;
+        font-size: 1.3rem;           
+        font-weight: bold;
+        border-radius: 8px;        
+        cursor: pointer;           
+        transition: background-color 0.4s ease, color 0.4s ease, font-size 0.4s ease; 
+    }
 
-            display: flex;
-            align-items: center;
-            justify-content:center;
+    /* Replaces your .active JavaScript class with native CSS :hover */
+    .hover-box:hover {
+        background-color: #2C83C6; 
+        color: #ffffff;            
+        font-size: 1rem;
+        text-align: justify;            
+    }
 
-            padding: 10px 20px;
-            box-sizing: border-box;
-            word-break: break-word;
-                
-            text-align: center;  
-            hyphens: auto;      
-            font-family: Arial, sans-serif;
-            font-size: 1.3rem;           
-            font-weight: bold;
-            border-radius: 8px;        
-            cursor: pointer;           
-            transition: background-color 0.4s ease, color 0.4s ease, font-size 0.4s ease; 
-        }
+    /* Hide the hover text by default */
+    .hover-text {
+        display: none;
+    }
 
-        .hover-box.active {
-            background-color: #2C83C6; 
-            color: #ffffff;            
-            font-size: 1rem;
-            hyphens: auto;
-            word-break: break-word;
-            text-align: justify;            
-        }
+    /* On hover, hide the default text */
+    .hover-box:hover .default-text {
+        display: none;
+    }
 
-        /*HEADER */
-        #header {
-            color: #000000;
-            display: flex;               
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;     
-            user-select: none;           
-            pointer-events: none;           
-            padding: 2rem 0;           
-            position: relative;
-            text-align: center;
-            z-index: 2;
-        }
+    /* On hover, show the new text */
+    .hover-box:hover .hover-text {
+        display: block;
+    }
 
-        /*LOGO */
-        #header .logo {
-            pointer-events: auto;        /* Re-enables clicks specifically on the logo */
-            border: 0px solid #000000 !important; /* Combined border properties into one shorthand */
-            font-family: "Source Sans Pro", Helvetica, sans-serif;
-            font-size: 1.5rem;
-            font-weight: 900;
-            letter-spacing: 0.075em;
-            line-height: 1;
-            /* Removed unnecessary padding: 0 and visibility: visible */
-        }
+    /* HEADER */
+    #header {
+        color: #000000;
+        display: flex;               
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;     
+        user-select: none;           
+        pointer-events: none;           
+        padding: 2rem 0;           
+        position: relative;
+        text-align: center;
+        z-index: 2;
+    }
 
-        #header .logo:hover {
-            border-color: #2C83C6 !important;
-            color: #2C83C6 !important;
-        } 
-    </style>
-</head>
-<body>
-    
-    <header id="header">
-        <a class="logo">Interactive Machine Learning Regression App</a>
-    </header>
-    
-    <div class="box-container">
-        <div class="hover-box" data-default="Explore Your Data" data-hover="Visualize key feature correlations, generate scatter plots, check distributions, and identify statistical trends before training.">
-            Explore Your Data
-        </div>
-        <div class="hover-box" data-default="Data Preprocessing" data-hover="Automatically handle missing data values, scale features, and customize your train/test dataset splits.">
-            Data Preprocessing
-        </div>
-        <div class="hover-box" data-default="Hyperparameter Tuning" data-hover="Fine-tune model parameters. Improve accuracy ">
-            Hyperparameter Tuning
-        </div>
+    /* LOGO */
+    #header .logo {
+        pointer-events: auto;        
+        border: 0px solid #000000 !important; 
+        font-family: "Source Sans Pro", Helvetica, sans-serif;
+        font-size: 1.5rem;
+        font-weight: 900;
+        letter-spacing: 0.075em;
+        line-height: 1;
+    }
+
+    #header .logo:hover {
+        border-color: #2C83C6 !important;
+        color: #2C83C6 !important;
+    } 
+</style>
+
+<header id="header">
+    <a class="logo">Interactive Machine Learning Regression App</a>
+</header>
+
+<div class="box-container">
+    <div class="hover-box">
+        <span class="default-text">Explore Your Data</span>
+        <span class="hover-text">Visualize key feature correlations, generate scatter plots, check distributions, and identify statistical trends before training.</span>
     </div>
-
-    <div class="box-container">
-        <div class="hover-box" data-default="Compare & Evaluate Metrics" data-hover="Evaluate models using metrics like R² Score, MAE, MSE,">
-            Compare & Evaluate Metrics
-        </div>
-        <div class="hover-box" data-default="Make Predictions" data-hover="Input custom test variables directly into your finalized model to forecast continuous numerical target values">
-            Make Predictions
-        </div>
-        <div class="hover-box" data-default="AI Explanation of Results" data-hover="Get natural language interpretations of your model's feature importance, weights, and overall predictions">
-            AI Explanation of Results
-        </div>
+    <div class="hover-box">
+        <span class="default-text">Data Preprocessing</span>
+        <span class="hover-text">Automatically handle missing data values, scale features, and customize your train/test dataset splits.</span>
     </div>
+    <div class="hover-box">
+        <span class="default-text">Hyperparameter Tuning</span>
+        <span class="hover-text">Fine-tune model parameters. Improve accuracy.</span>
+    </div>
+</div>
 
-    <script>
-        const boxes = document.querySelectorAll('.hover-box');
-
-        boxes.forEach(box => {
-            box.addEventListener('mouseenter', () => {
-                box.textContent = box.getAttribute('data-hover');
-                box.classList.add('active');
-            });
-
-            box.addEventListener('mouseleave', () => {
-                box.textContent = box.getAttribute('data-default');
-                box.classList.remove('active');
-            });
-        });
-    </script>
-
-</body>
-</html>
+<div class="box-container">
+    <div class="hover-box">
+        <span class="default-text">Compare & Evaluate Metrics</span>
+        <span class="hover-text">Evaluate models using metrics like R² Score, MAE, MSE.</span>
+    </div>
+    <div class="hover-box">
+        <span class="default-text">Make Predictions</span>
+        <span class="hover-text">Input custom test variables directly into your finalized model to forecast continuous numerical target values.</span>
+    </div>
+    <div class="hover-box">
+        <span class="default-text">AI Explanation of Results</span>
+        <span class="hover-text">Get natural language interpretations of your model's feature importance, weights, and overall predictions.</span>
+    </div>
+</div>
