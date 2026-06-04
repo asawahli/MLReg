@@ -1,6 +1,17 @@
 import streamlit as st
 import pandas as pd
 
+### functions #####
+
+
+@st.dialog("Demo Datasets")
+def load_demo_data(n):
+    st.session_state.df = pd.read_csv(f"demos/demo{n}.csv")
+    st.success(
+        "Demo dataset loaded successfully! you can now navigate to **Explore Data** and explore the data and train models."
+    )
+
+
 # Page Configuration
 st.set_page_config(page_title="Guidelines", layout="wide")
 
@@ -103,15 +114,6 @@ with st.expander("4. AI Assistance Settings", expanded=False):
         * click the "Save Settings" button to enable AI support. You can now use the AI assistance features throughout the app for data analysis and model interpretation.
                         """)
 
-
-@st.dialog("Demo Datasets")
-def load_demo_data(n):
-    st.session_state.df = pd.read_csv(f"demos/demo{n}.csv")
-    st.success(
-        "Demo dataset loaded successfully! you can now navigate to **Explore Data** and explore the data and train models."
-    )
-
-
 with st.expander("5. Demos", expanded=False):
     st.write("Here are some example datasets you can use to test the application:")
     st.markdown("""
@@ -123,7 +125,8 @@ Select a pre-loaded sample dataset below to test the application features instan
         on_click=lambda: load_demo_data(1),
     )
     st.button("Load demo dataset 2", on_click=lambda: load_demo_data(2))
-# Optional: Add a friendly button to jump back home
+
+# jump back home
 st.write("---")
 if st.button("Ready? Go back to Home"):
     st.switch_page("pages/home.py")
