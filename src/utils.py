@@ -6,7 +6,12 @@ import seaborn as sns
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+from sklearn.metrics import (
+    r2_score,
+    mean_squared_error,
+    mean_absolute_error,
+    root_mean_squared_error,
+)
 from scipy import stats
 
 
@@ -62,6 +67,6 @@ def compute_metrics(y_true, y_pred):
     return {
         "r2": float(r2_score(y_true, y_pred)),
         "mse": float(mean_squared_error(y_true, y_pred)),
-        "rmse": float(mean_squared_error(y_true, y_pred)),
+        "rmse": float(root_mean_squared_error(y_true, y_pred)),
         "mae": float(mean_absolute_error(y_true, y_pred)),
     }
